@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+/* 1. Style the actual country select dropdown */
+.PhoneInputCountrySelect {
+  background-color: #1a1a1a !important; /* Dark background to see names */
+  color: white !important;             /* White text for names */
+}
+
+/* 2. Style the option tags specifically (for some browsers) */
+.PhoneInputCountrySelect option {
+  background-color: #1a1a1a !important;
+  color: white !important;
+}
+
+/* 3. Ensure the input text inside the glass box is white */
+.PhoneInputInput {
+  background: transparent !important;
+  border: none !important;
+  color: white !important;
+  padding: 0.5rem;
+  outline: none;
+}
+
+/* 4. Improve the flag icon alignment */
+.PhoneInputCountryIcon {
+  margin-left: 0.5rem;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
