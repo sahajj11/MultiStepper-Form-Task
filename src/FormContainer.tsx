@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState, useEffect } from "react";
 import Step1Basic from "./components/multiStepForm/Step1Basic";
 import Step2Address from "./components/multiStepForm/Step2Address";
 import Step3File from "./components/multiStepForm/Step3File";
@@ -8,34 +9,66 @@ import SuccessScreen from "./components/multiStepForm/SuccescScreen";
 
 
 const FormContainer: React.FC = () => {
-  const [step, setStep] = useState(1);
+  // Helper to get data from LocalStorage
+  const getSavedValue = (key: string, defaultValue: any) => {
+    const saved = localStorage.getItem(key);
+    if (saved !== null) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return saved;
+      }
+    }
+    return defaultValue;
+  };
+
+  // --- PERSISTED STATES ---
+  const [step, setStep] = useState(() => getSavedValue("f1_step", 1));
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Requirement #1: Individual States
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [phone, setPhone] = useState<string | undefined>("");
-  const [street, setStreet] = useState("");
-  const [city, setCity] = useState("");
-  const [stateProv, setStateProv] = useState("");
-  const [zip, setZip] = useState("");
-  const [country, setCountry] = useState("");
+  const [title, setTitle] = useState(() => getSavedValue("f1_title", ""));
+  const [description, setDescription] = useState(() => getSavedValue("f1_description", ""));
+  const [phone, setPhone] = useState<string | undefined>(() => getSavedValue("f1_phone", ""));
+  const [street, setStreet] = useState(() => getSavedValue("f1_street", ""));
+  const [city, setCity] = useState(() => getSavedValue("f1_city", ""));
+  const [stateProv, setStateProv] = useState(() => getSavedValue("f1_stateProv", ""));
+  const [zip, setZip] = useState(() => getSavedValue("f1_zip", ""));
+  const [country, setCountry] = useState(() => getSavedValue("f1_country", ""));
+
+  // File state (Memory only - LocalStorage doesn't support File objects well)
   const [file, setFile] = useState<File | null>(null);
+
+  // --- SYNC TO LOCAL STORAGE ---
+  useEffect(() => {
+    localStorage.setItem("f1_step", JSON.stringify(step));
+    localStorage.setItem("f1_title", JSON.stringify(title));
+    localStorage.setItem("f1_description", JSON.stringify(description));
+    localStorage.setItem("f1_phone", JSON.stringify(phone));
+    localStorage.setItem("f1_street", JSON.stringify(street));
+    localStorage.setItem("f1_city", JSON.stringify(city));
+    localStorage.setItem("f1_stateProv", JSON.stringify(stateProv));
+    localStorage.setItem("f1_zip", JSON.stringify(zip));
+    localStorage.setItem("f1_country", JSON.stringify(country));
+  }, [step, title, description, phone, street, city, stateProv, zip, country]);
 
   const handleFinish = () => {
     setIsSubmitted(true);
+    // Keep data in storage in case they refresh on the success screen
   };
 
   const handleReset = () => {
+    // Clear Local States
     setTitle(""); setDescription(""); setPhone("");
     setStreet(""); setCity(""); setStateProv(""); setZip(""); setCountry("");
     setFile(null); 
     setStep(1);
     setIsSubmitted(false);
+    // Wipe LocalStorage
+    localStorage.clear();
   };
 
-  const nextStep = () => setStep((prev) => prev + 1);
-  const prevStep = () => setStep((prev) => prev - 1);
+  const nextStep = () => setStep((prev: number) => prev + 1);
+  const prevStep = () => setStep((prev: number) => prev - 1);
 
   return (
     <div className="relative flex items-center justify-center min-h-screen py-12 px-4 overflow-hidden">
@@ -87,21 +120,10 @@ const FormContainer: React.FC = () => {
               />
             </div>
           </div>
-
-          <div className="mt-4 flex justify-end gap-4">
-            <div>
-              <p className="text-xs font-black text-white italic">24°C</p>
-              <p className="text-[8px] text-gray-500 uppercase">Track</p>
-            </div>
-            <div>
-              <p className="text-xs font-black text-white italic">12%</p>
-              <p className="text-[8px] text-gray-500 uppercase">Humidity</p>
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* THE GLASS CARD (Centered) */}
+      {/* THE GLASS CARD */}
       <div className="w-full max-w-xl bg-white/10 backdrop-blur-sm rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] border border-white/20 p-8 relative z-10 overflow-hidden">
         
         <div className="absolute top-0 left-0 w-full h-1.5 bg-[#e10600] shadow-[0_0_20px_rgba(225,6,0,0.6)]" />
